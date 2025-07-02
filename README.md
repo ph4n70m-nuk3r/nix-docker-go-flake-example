@@ -1,5 +1,5 @@
-# nix-docker-go-flake-example  
-
+# nix-docker-go-flake-example
+![CI Status](https://github.com/ph4n70m-nuk3r/nix-docker-go-flake-example/actions/workflows/ci.yml/badge.svg)
 ## Prerequisites
 Either:
 - create `export-gh-pat.sh` file with contents like:  
