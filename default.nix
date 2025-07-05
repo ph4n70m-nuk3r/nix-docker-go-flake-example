@@ -1,4 +1,4 @@
-{ pkgs ? (
+{ stdenv, pkgs ? (
     let
       inherit (builtins) fetchTree fromJSON readFile;
       inherit ((fromJSON (readFile ./flake.lock)).nodes) nixpkgs gomod2nix;
@@ -18,13 +18,12 @@
   pwd = ./.;
   src = ./.;
   modules = ./gomod2nix.toml;
-
-  nativeBuildInputs = [ pkgs.musl pkgs.gcc ];
-  ldflags = [
-    "-extldflags -static"
-    "-s"  # strip debug info
-    "-w"
-  ];
+#  nativeBuildInputs = [ pkgs.musl ];
+#  ldflags = [
+#    "-extldflags -static"
+#    "-s"  # strip debug info
+#    "-w"
+#  ];
 }).overrideAttrs (old: {
   # Override CGO_ENABLED
   CGO_ENABLED = "0";

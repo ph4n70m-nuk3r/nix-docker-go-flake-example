@@ -13,9 +13,10 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           callPackage = pkgs.callPackage;
-          go-app-derivation = callPackage ./. {
-            inherit (gomod2nix.legacyPackages.${system}) buildGoApplication;
-          };
+          go-app-derivation = #if system == "x86_64-linux" || system == "aarch64-linux" then
+              callPackage ./default.nix { inherit (pkgs) stdenv; inherit (gomod2nix.legacyPackages.${system}) buildGoApplication; };
+#            else #if system == "x86_64-darwin" || system == "aarch64-darwin" then
+#              callPackage ./default.nix { stdenv = pkgs.clangStdenv; inherit (gomod2nix.legacyPackages.${system}) buildGoApplication; };
         in
         {
           packages.default = go-app-derivation;
