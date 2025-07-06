@@ -9,7 +9,7 @@ Either:
 ## Build app
 ```shell
 ./build.sh app
-ls -lah result
+ls -lah result/bin/
 ```
 -------------------------------------------
 ## Run app
