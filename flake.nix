@@ -18,13 +18,15 @@
           callPackage = pkgs.callPackage;
           go-app-derivation =
               callPackage ./default.nix { inherit (pkgs) stdenv; inherit (gomod2nix.legacyPackages.${system}) buildGoApplication; };
-          packages.default = go-app-derivation;
-          packages.docker = pkgs.dockerTools.buildLayeredImage {
+          docker-image-derivation = pkgs.dockerTools.buildLayeredImage {
             name = "nix-docker-go-flake-example";
             tag = "latest";
             contents = with pkgs; [ cacert ];
             config.Cmd = "${go-app-derivation}/bin/nix-docker-go-flake-example";
           };
+          packages.app = go-app-derivation;
+          packages.docker = docker-image-derivation;
+          packages.default = docker-image-derivation;
           devShells.default = callPackage ./shell.nix {
             inherit (gomod2nix.legacyPackages.${system}) mkGoEnv gomod2nix;
           };
