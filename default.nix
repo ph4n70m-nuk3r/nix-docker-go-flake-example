@@ -14,17 +14,10 @@
 
 (buildGoApplication {
   pname = "nix-docker-go-flake-example";
-  version = "0.1";
+  version = "0.1.0";
   pwd = ./.;
   src = ./.;
   modules = ./gomod2nix.toml;
-#  nativeBuildInputs = [ pkgs.musl ];
-#  ldflags = [
-#    "-extldflags -static"
-#    "-s"  # strip debug info
-#    "-w"
-#  ];
 }).overrideAttrs (old: {
-  # Override CGO_ENABLED
   CGO_ENABLED = "0";
 })

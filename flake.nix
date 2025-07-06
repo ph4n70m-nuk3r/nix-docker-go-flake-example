@@ -8,17 +8,16 @@
     gomod2nix.inputs.flake-utils.follows = "flake-utils";
   };
   outputs = { self, nixpkgs, flake-utils, gomod2nix } @ inputs:
-    (flake-utils.lib.eachDefaultSystem
+    let
+      systems = ["x86_64-linux" "aarch64-linux"];
+    in
+    (flake-utils.lib.eachSystem systems
       (system:
-        let
+        rec {
           pkgs = nixpkgs.legacyPackages.${system};
           callPackage = pkgs.callPackage;
-          go-app-derivation = #if system == "x86_64-linux" || system == "aarch64-linux" then
+          go-app-derivation =
               callPackage ./default.nix { inherit (pkgs) stdenv; inherit (gomod2nix.legacyPackages.${system}) buildGoApplication; };
-#            else #if system == "x86_64-darwin" || system == "aarch64-darwin" then
-#              callPackage ./default.nix { stdenv = pkgs.clangStdenv; inherit (gomod2nix.legacyPackages.${system}) buildGoApplication; };
-        in
-        {
           packages.default = go-app-derivation;
           packages.docker = pkgs.dockerTools.buildLayeredImage {
             name = "nix-docker-go-flake-example";
@@ -30,5 +29,5 @@
             inherit (gomod2nix.legacyPackages.${system}) mkGoEnv gomod2nix;
           };
         })
-    ) // { nixosModules.default = import ./services.nix inputs; };
+    );
 }
