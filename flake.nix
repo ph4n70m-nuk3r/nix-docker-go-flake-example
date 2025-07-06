@@ -8,26 +8,28 @@
     gomod2nix.inputs.flake-utils.follows = "flake-utils";
   };
   outputs = { self, nixpkgs, flake-utils, gomod2nix } @ inputs:
-    (flake-utils.lib.eachDefaultSystem
+    let
+      systems = ["x86_64-linux" "aarch64-linux"];
+    in
+    (flake-utils.lib.eachSystem systems
       (system:
-        let
+        rec {
           pkgs = nixpkgs.legacyPackages.${system};
           callPackage = pkgs.callPackage;
-          go-app-derivation = callPackage ./. {
-            inherit (gomod2nix.legacyPackages.${system}) buildGoApplication;
-          };
-        in
-        {
-          packages.default = go-app-derivation;
-          packages.docker = pkgs.dockerTools.buildLayeredImage {
+          go-app-derivation =
+              callPackage ./default.nix { inherit (pkgs) stdenv; inherit (gomod2nix.legacyPackages.${system}) buildGoApplication; };
+          docker-image-derivation = pkgs.dockerTools.buildLayeredImage {
             name = "nix-docker-go-flake-example";
             tag = "latest";
             contents = with pkgs; [ cacert ];
             config.Cmd = "${go-app-derivation}/bin/nix-docker-go-flake-example";
           };
+          packages.app = go-app-derivation;
+          packages.docker = docker-image-derivation;
+          packages.default = docker-image-derivation;
           devShells.default = callPackage ./shell.nix {
             inherit (gomod2nix.legacyPackages.${system}) mkGoEnv gomod2nix;
           };
         })
-    ) // { nixosModules.default = import ./services.nix inputs; };
+    );
 }
