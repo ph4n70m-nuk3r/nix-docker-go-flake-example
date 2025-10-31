@@ -15,11 +15,13 @@ jobs:
     steps:
       - name: Set up Nix
         uses: cachix/install-nix-action@v31
+        with:
+          nix_path: "nixpkgs=channel:nixos-unstable"
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Build go app + docker image using Nix
-        run: nix build .#docker
-      - name: load image
-        run: docker load < result
-      - name: check images
-        run: docker image ls
+        shell: bash
+        run: |
+          nix build .#docker
+          docker load < result
+          docker image ls
